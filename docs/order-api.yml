@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Order API
-  version: "1.0.0"
+  version: "1.0.1"
 servers:
   - url: https://localhost:8000
 paths:
@@ -16,22 +16,16 @@ paths:
             schema:
               type: object
               required:
-                - cart
+                - product_id
+                - quantity
               properties:
-                cart:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      product_id:
-                        type: integer
-                      quantity:
-                        type: integer
-                  example:
-                    - product_id: 1
-                      quantity: 5
-                    - product_id: 2
-                      quantity: 3
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+              example:
+                product_id: 1
+                quantity: 5
       responses:
         "201":
           description: Order created successfully.
@@ -45,17 +39,49 @@ paths:
                     properties:
                       id:
                         type: integer
-                      cart:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            product_id:
-                              type: integer
-                            quantity:
-                              type: integer
-                        example:
-                          - product_id: 1
-                            quantity: 5
-                          - product_id: 2
-                            quantity: 3
+                      product_id:
+                        type: integer
+                      quantity:
+                        type: integer
+                      total_price:
+                        type: number
+                    example:
+                      product_id: 1
+                      quantity: 5
+                      total_price: 25000
+        "404":
+          description: Data not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                example:
+                  errors:
+                    message: [Data not found]
+        "409":
+          description: Conflict error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                example:
+                  errors:
+                    message: [Product's stock is unavailable]
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                example:
+                  errors:
+                    message: [Internal server error]
