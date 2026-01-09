@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Order API
-  version: "1.0.1"
+  version: "1.0.0"
 servers:
   - url: https://localhost:8000
 paths:
@@ -49,6 +49,18 @@ paths:
                       product_id: 1
                       quantity: 5
                       total_price: 25000
+        "400":
+          description: Bad Request - Validation Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                example:
+                  errors:
+                    product_id: [The product_id field is required]
         "404":
           description: Data not found
           content:
@@ -73,15 +85,3 @@ paths:
                 example:
                   errors:
                     message: [Product's stock is unavailable]
-        "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: object
-                example:
-                  errors:
-                    message: [Internal server error]

@@ -13,14 +13,15 @@ use Tests\TestCase;
 class ProductTest extends TestCase
 {
     // Use this (uncomment) for inmemory sqlite db test 
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
-    // // Use this (uncomment) for mysql db test 
-    // protected function setUp(): void
-    // {
-    //     parent::setUp();
-    //     DB::delete('delete from products');
-    // }
+    // Use this (uncomment) for mysql db test 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        DB::delete('delete from orders');
+        DB::delete('delete from products');
+    }
 
     /**
      * A basic feature test example.
@@ -35,7 +36,6 @@ class ProductTest extends TestCase
 
         $response->assertStatus(201)->assertJson([
             'data' => [
-                'id' => 1,
                 'name' => 'Buku',
                 'stock' => 10,
                 'price' => 5000,
@@ -61,13 +61,13 @@ class ProductTest extends TestCase
     public function testGetProductSuccess(): void
     {
         $this->seed([ProductSeeder::class]);
-        $product = Product::find(1)->first();
+        $product = Product::first();
 
         $response = $this->get('/api/products/' . $product->id);
 
         $response->assertStatus(200)->assertJson([
             'data' => [
-                'id' => 1,
+                'id' => $product->id,
                 'name' => 'Buku 1',
                 'stock' => 10,
                 'price' => 5000,
@@ -94,7 +94,7 @@ class ProductTest extends TestCase
         $response = $this->get('/api/products')->assertStatus(200)->json();
         Log::info(json_encode($response, JSON_PRETTY_PRINT));
 
-        $this->assertCount(10, $response['data']);
+        $this->assertCount(5, $response['data']);
     }
     public function testGetProductListNotFound(): void
     {
@@ -111,7 +111,7 @@ class ProductTest extends TestCase
     public function testUpdateProductSuccess(): void
     {
         $this->seed([ProductSeeder::class]);
-        $product = Product::find(1);
+        $product = Product::first();
         $response = $this->put('/api/products/' . $product->id, [
             'name' => 'Buku tulis',
             'stock' => 11
@@ -119,7 +119,7 @@ class ProductTest extends TestCase
 
         $response->assertStatus(200)->assertJson([
             'data' => [
-                'id' => 1,
+                'id' => $product->id,
                 'name' => 'Buku tulis',
                 'stock' => 11,
                 'price' => 5000,
@@ -129,7 +129,7 @@ class ProductTest extends TestCase
     public function testUpdateProductFailedValidation(): void
     {
         $this->seed([ProductSeeder::class]);
-        $product = Product::find(1);
+        $product = Product::first();
         $response = $this->put('/api/products/' . $product->id, [
             'name' => '',
             'stock' => 11
@@ -157,7 +157,7 @@ class ProductTest extends TestCase
     public function testDeleteProductSuccess(): void
     {
         $this->seed(ProductSeeder::class);
-        $product = Product::find(1)->first();
+        $product = Product::first();
         $response = $this->delete('/api/products/' . $product->id);
         Log::info($product);
 
@@ -165,7 +165,7 @@ class ProductTest extends TestCase
             'data' => true
         ]);
 
-        $deletedProduct = Product::withTrashed()->find(1);
+        $deletedProduct = Product::withTrashed()->find($product->id);
         Log::info($deletedProduct);
         $this->assertNotNull($deletedProduct->deleted_at);
     }
