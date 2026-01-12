@@ -1,9 +1,9 @@
 openapi: "3.0.3"
 info:
   title: Order API
-  version: "1.0.0"
+  version: "1.0.1"
 servers:
-  - url: https://localhost:8000
+  - url: http://127.0.0.1:80
 paths:
   /api/orders:
     post:
